@@ -1,0 +1,7 @@
+# Normalize line endings: LF in the repo, native on checkout.
+* text=auto eol=lf
+# PowerShell stays CRLF (Windows-native).
+*.ps1 text eol=crlf
+# Treat common binaries as binary.
+*.png binary
+*.gguf binary

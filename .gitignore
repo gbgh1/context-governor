@@ -1,0 +1,67 @@
+# --- Session transcripts (raw assistant logs; may contain sensitive data) ---
+session-*.md
+
+# --- Live-run captures (real agent sessions: tool outputs / paths may be sensitive) ---
+tests/live_tests/
+
+# --- Local agent working dirs (per-tool scratch; not part of the project) ---
+.hermes/
+.hermes.md
+.commandcode/
+opencode_agent/
+
+# --- Secrets / credentials (sterilize before any GitHub push) ---
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+**/api_key*
+config.local.*
+.claude/settings.local.json
+.claude/**/*.local.*
+
+# --- Model weights & large binaries (never commit) ---
+*.gguf
+*.bin
+*.safetensors
+models/
+
+# --- Runtime context store (session data may be sensitive) ---
+.cm_store/
+contextstore/            # default CM_STORE_ROOT for the proxy + mcp server
+**/contextstore/
+store/runtime/
+data/runtime/
+*.sqlite
+*.sqlite3
+*.db
+vectors/
+*.index
+logs/
+*.log
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+
+# --- Node / TypeScript ---
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

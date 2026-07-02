@@ -1,0 +1,31 @@
+# Tier-0 Hermes Agent config patch — immediate compaction-loop relief (no code).
+#
+# Apply these keys to your active Hermes `config.yaml`. `compression.*` and
+# `model.context_length` HOT-RELOAD on a running gateway. This bounds the
+# fruitless re-compaction loop on its own; the Context Governor proxy removes
+# the residual (a single giant tool dump that still overflows the protected
+# tail). See tasks/plan.md §"Tier 0" and wiki/hermes-compaction.md for the why.
+
+model:
+  # MUST match `llama-server -c`. If the summarizer (auxiliary.compression) model
+  # context < this, Hermes drops the middle SILENTLY (no summary). Keep them equal.
+  context_length: 75776
+
+compression:
+  enabled: true
+  threshold: 0.72          # was 0.50 — fire later, leave real headroom
+  target_ratio: 0.12       # was 0.20 — smaller protected-tail token budget
+  protect_last_n: 8        # was 20  — fewer protected tail messages
+  protect_first_n: 3
+  hygiene_hard_message_limit: 5000
+
+auxiliary:
+  compression:
+    model: ""              # "" = same local model (ctx == main, OK)
+    provider: "auto"
+    # NEVER point this at a smaller-context model: if summarizer ctx < main,
+    # Hermes drops the middle SILENTLY instead of compressing.
+
+# Limit of Tier-0: it bounds the tail COUNT and TOKEN BUDGET, but NOT individual
+# message size. One 40K-token file dump in the protected tail still breaks it.
+# That residual is exactly what the Governor proxy removes (handle-ization).

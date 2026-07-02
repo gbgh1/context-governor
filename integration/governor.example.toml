@@ -1,0 +1,27 @@
+# Context Governor — central config.   run-governor --config governor.toml --provider llama
+#
+# Precedence (low -> high):  built-in defaults  <  this file  <  --provider  <  CLI flags
+# API keys are NEVER stored here — only the NAME of the env var to read them from.
+
+[proxy]
+listen_host = "127.0.0.1"
+listen_port = 8900
+store_root = "./contextstore"
+handle_threshold_ratio = 0.02     # anchor handle-ization to 2% of the real n_ctx (when known)
+context_budget_ratio = 0.50       # bound the wire to ~50% of the real window (stay under the host CLI's own compaction line)
+auto_recall_k = 3                 # Pass-4 auto-recall: max off-wire slices injected per request (0 = off)
+recall_budget_tokens = 1500       # max tokens the recall block may occupy (~2% of a 75K window)
+diff_max_chars = 20000            # skip diff-encoding above ~20 KB (anti brain-lock)
+tokenize_max_chars = 100000       # never POST >100 KB to the tokenizer (DoS seatbelt)
+
+[providers.llama]
+upstream_base_url = "http://127.0.0.1:8080"
+
+[providers.ollama]
+upstream_base_url = "http://127.0.0.1:11434"
+
+[providers.openai]
+upstream_base_url = "https://api.openai.com"
+api_key_env = "OPENAI_API_KEY"    # the key is read from THIS env var at launch, not stored here
+
+# [providers.anthropic]  — deferred (Anthropic adapter + subscription-proxy question unresolved)

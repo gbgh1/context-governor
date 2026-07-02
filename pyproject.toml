@@ -1,0 +1,43 @@
+[project]
+name = "contextmanager"
+version = "0.1.0"
+description = "Universal context governor for local-LLM agent CLIs: an OpenAI-compatible proxy + MCP server that keeps an agent's context bounded over long sessions in front of llama-server."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+keywords = ["llm", "llama-cpp", "context-management", "mcp", "agent", "proxy", "hermes", "opencode"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Operating System :: OS Independent",
+]
+dependencies = ["httpx", "fastapi", "uvicorn", "mcp"]
+
+[project.optional-dependencies]
+dev = ["pytest", "hypothesis", "pytest-asyncio"]
+# Optional: only needed to AUTO-WIRE Hermes (its config is YAML). Core stays dep-light;
+# the wiring module imports yaml lazily and errors with an install hint if it is absent.
+wiring = ["pyyaml"]
+
+[project.scripts]
+run-governor = "contextmanager.launcher:main"
+context-governor-proxy = "contextmanager.proxy.__main__:main"
+context-governor-mcp = "contextmanager.mcp.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/contextmanager"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+# Proxy async tests (tests/proxy/test_app_*.py, test_upstream.py) mark each
+# coroutine test with @pytest.mark.asyncio; strict mode requires that marker.
+asyncio_mode = "strict"
